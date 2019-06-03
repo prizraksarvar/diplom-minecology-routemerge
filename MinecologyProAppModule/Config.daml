@@ -1,12 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ArcGIS defaultAssembly="MinecologyProAppModule.dll"
-        defaultNamespace="MinecologyProAppModule"
-        xmlns="http://schemas.esri.com/DADF/Registry"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
-
+﻿<ArcGIS defaultAssembly="MinecologyProAppModule.dll" defaultNamespace="MinecologyProAppModule" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
   <AddInInfo id="{e444311d-e542-4bef-a159-29aa0f495b98}" version="1.0" desktopVersion="2.3.15769">
-    <Name>MinecologyProAppModule</Name>   
+    <Name>MinecologyProAppModule</Name>
     <Description>MinecologyProAppModule description</Description>
     <Image>Images\AddinDesktop32.png</Image>
     <Author>sarkh</Author>
@@ -16,7 +10,6 @@
     <!-- Note subject can be one or more of these topics:
                     Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
   </AddInInfo>
-
   <modules>
     <insertModule id="MinecologyProAppModule_Module" className="Module1" autoLoad="false" caption="Module1">
       <!-- uncomment to have the control hosted on a separate tab-->
@@ -25,19 +18,26 @@
           <group refID="MinecologyProAppModule_Group1"/>
         </tab>-->
       </tabs>
-              
       <groups>
         <!-- comment this out if you have no controls on the Addin tab to avoid
               an empty group-->
         <group id="MinecologyProAppModule_Group1" caption="Group 1" appearsOnAddInTab="true">
           <!-- host controls within groups -->
+          <button refID="MinecologyProAppModule_Button1" size="large" />
         </group>
       </groups>
-      
       <controls>
         <!-- add your controls here -->
-      </controls> 
-      
+        <button id="MinecologyProAppModule_Button1" caption="Комплексирование маршрутов" className="Button1" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue32.png">
+          <tooltip heading="Tooltip Heading">Комплексирование маршрутов перевозки ТКО<disabledText /></tooltip>
+        </button>
+      </controls>
     </insertModule>
   </modules>
+  <backstage>
+    <insertButton refID="MinecologyProAppModule_BackstageTab1_Button" insert="before" placeWith="esri_core_exitApplicationButton" separator="true" />
+    <insertTab id="MinecologyProAppModule_BackstageTab1" caption="BackstageTab 1" className="BackstageTab1ViewModel" insert="before" placeWith="esri_core_exitApplicationButton">
+      <content className="BackstageTab1View" />
+    </insertTab>
+  </backstage>
 </ArcGIS>
