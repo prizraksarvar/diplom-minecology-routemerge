@@ -147,11 +147,20 @@ namespace MinecologyProAppModule
                 {
                     return;
                 }
-                var a = polutionGeoms.Where(pg => GeometryEngine.Instance.Intersects(pg.geometry,polutionGeom.geometry));
-                foreach(var b in a)
+                var a = polutionGeoms.Where(pg => !GeometryEngine.Instance.Equals(pg.geometry, polutionGeom.geometry) 
+                        && !GeometryEngine.Instance.Touches(pg.geometry,polutionGeom.geometry)
+                        && GeometryEngine.Instance.Intersects(pg.geometry,polutionGeom.geometry));
+                if (a.Count() > 0)
                 {
-                    polutionGeoms.Remove(b);
-                    addGeoms(b,polutionGeom);
+                    foreach (var b in a)
+                    {
+                        polutionGeoms.Remove(b);
+                        addGeoms(b, polutionGeom);
+                    }
+                }
+                else
+                {
+                    polutionGeoms.Add(polutionGeom);
                 }
             }
 
