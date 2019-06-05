@@ -109,10 +109,11 @@ namespace MinecologyProAppModule
 
                                 inspector.Load(routesLayer, feature2.GetObjectID());
                                 d2 = double.Parse(inspector["From_C13"].ToString());
-
                                 addGeoms(g,g2,d,d2);
+                                break;
                             }
                         }
+                        break;
                     }
                 }
 
@@ -136,9 +137,10 @@ namespace MinecologyProAppModule
 
             private void addGeoms(Geometry g, Geometry g2, double d, double d2)
             {
-                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g, g2), d));
-                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g2, g), d2));
-                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Intersection(g, g2), d2 + d));
+                var g3 = GeometryEngine.Instance.Intersection(g, g2);
+                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g, g3), d));
+                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g2, g3), d2));
+                addPolutionGeom(new PolutionGeom(g3, d2 + d));
             }
 
             private void addPolutionGeom(PolutionGeom polutionGeom)
@@ -147,15 +149,15 @@ namespace MinecologyProAppModule
                 {
                     return;
                 }
-                var a = polutionGeoms.Where(pg => !GeometryEngine.Instance.Equals(pg.geometry, polutionGeom.geometry) 
-                        && !GeometryEngine.Instance.Touches(pg.geometry,polutionGeom.geometry)
-                        && GeometryEngine.Instance.Intersects(pg.geometry,polutionGeom.geometry));
+                var a = new List<PolutionGeom>(polutionGeoms.Where(pg => GeometryEngine.Instance.Intersects(pg.geometry,polutionGeom.geometry)
+                        && !GeometryEngine.Instance.Intersection(pg.geometry,polutionGeom.geometry).IsEmpty));
                 if (a.Count() > 0)
                 {
                     foreach (var b in a)
                     {
                         polutionGeoms.Remove(b);
                         addGeoms(b, polutionGeom);
+                        break;
                     }
                 }
                 else
