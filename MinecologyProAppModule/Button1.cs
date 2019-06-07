@@ -110,10 +110,8 @@ namespace MinecologyProAppModule
                                 inspector.Load(routesLayer, feature2.GetObjectID());
                                 d2 = double.Parse(inspector["From_C13"].ToString());
                                 addGeoms(g,g2,d,d2);
-                                break;
                             }
                         }
-                        break;
                     }
                 }
 
@@ -157,7 +155,6 @@ namespace MinecologyProAppModule
                     {
                         polutionGeoms.Remove(b);
                         addGeoms(b, polutionGeom);
-                        break;
                     }
                 }
                 else
