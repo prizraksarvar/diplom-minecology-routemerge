@@ -79,7 +79,11 @@ namespace MinecologyProAppModule
                 double d = 0;
                 double d2 = 0;
                 bool skip = false;
-                using (var cursor = featureClass.Search())
+
+                Selection selection = routesLayer.GetSelection();
+                QueryFilter queryFilter = new QueryFilter();
+                queryFilter.ObjectIDs = selection.GetObjectIDs();
+                using (var cursor = featureClass.Search(queryFilter))
                 {
                     while (cursor.MoveNext())
                     {
@@ -88,7 +92,7 @@ namespace MinecologyProAppModule
                         var g = feature.GetShape();
                         inspector.Load(routesLayer, feature.GetObjectID());
                         d = double.Parse(inspector["From_C13"].ToString());
-                        using (var cursor2 = featureClass.Search())
+                        using (var cursor2 = featureClass.Search(queryFilter))
                         {
                             skip = true;
                             while (cursor2.MoveNext())
