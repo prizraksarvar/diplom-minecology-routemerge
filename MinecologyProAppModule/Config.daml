@@ -24,11 +24,15 @@
         <group id="MinecologyProAppModule_Group1" caption="Group 1" appearsOnAddInTab="true">
           <!-- host controls within groups -->
           <button refID="MinecologyProAppModule_Button1" size="large" />
+          <button refID="MinecologyProAppModule_ProWindow1" size="large" />
         </group>
       </groups>
       <controls>
         <!-- add your controls here -->
-        <button id="MinecologyProAppModule_Button1" caption="Комплексирование маршрутов" className="Button1" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue32.png">
+        <!--button id="MinecologyProAppModule_Button1" caption="Комплексирование маршрутов" className="Button1" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue32.png">
+          <tooltip heading="Tooltip Heading">Комплексирование маршрутов перевозки ТКО<disabledText /></tooltip>
+        </button-->
+        <button id="MinecologyProAppModule_ProWindow1" caption="Комплексирование маршрутов" className="ShowProWindow1" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple32.png">
           <tooltip heading="Tooltip Heading">Комплексирование маршрутов перевозки ТКО<disabledText /></tooltip>
         </button>
       </controls>

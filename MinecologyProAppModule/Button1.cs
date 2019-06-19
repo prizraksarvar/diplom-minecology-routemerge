@@ -24,16 +24,23 @@ namespace MinecologyProAppModule
         {
             var routesLayer = MapView.Active.Map.GetLayersAsFlattenedList().OfType<FeatureLayer>().FirstOrDefault(f => f.ShapeType == esriGeometryType.esriGeometryPolyline && f.Name== "Маршруты");
             var routesNewLayer = MapView.Active.Map.GetLayersAsFlattenedList().OfType<FeatureLayer>().FirstOrDefault(f => f.ShapeType == esriGeometryType.esriGeometryPolyline && f.Name== "Маршруты объединенные");
+            var dotsNewLayer = MapView.Active.Map.GetLayersAsFlattenedList().OfType<FeatureLayer>().FirstOrDefault(f => f.ShapeType == esriGeometryType.esriGeometryPoint && f.Name== "repoint");
             
             if (routesLayer == null)
             {
-                MessageBox.Show($@"To run this sample you need to have a polygon feature class layer.");
+                MessageBox.Show($@"To run this sample you need to have a polyline feature class layer.");
                 return;
             }
 
             if (routesNewLayer == null)
             {
-                MessageBox.Show($@"To run this sample you need to have a polygon feature class layer.");
+                MessageBox.Show($@"To run this sample you need to have a polyline feature class layer.");
+                return;
+            }
+
+            if (dotsNewLayer == null)
+            {
+                MessageBox.Show($@"To run this sample you need to have a point feature class layer.");
                 return;
             }
 
@@ -51,7 +58,7 @@ namespace MinecologyProAppModule
                     if (fc == null) return;
                     var fcDefinition = fc.GetDefinition();
 
-                    var proccessor = new AppProccessor(fc, routesLayer, routesNewLayer);
+                    var proccessor = new AppProccessor(fc, routesLayer, routesNewLayer, dotsNewLayer);
                     proccessor.execute(status);
                 }, status.Progressor);
             }
@@ -73,19 +80,27 @@ namespace MinecologyProAppModule
 
             FeatureLayer routesLayer;
             FeatureLayer routesNewLayer;
+            FeatureLayer dotsNewLayer;
 
-            public AppProccessor (FeatureClass featureClass, FeatureLayer routesLayer, FeatureLayer routesNewLayer) {
+            public AppProccessor (FeatureClass featureClass, FeatureLayer routesLayer, FeatureLayer routesNewLayer, FeatureLayer dotsNewLayer) {
                 this.featureClass = featureClass;
                 this.routesLayer = routesLayer;
                 this.routesNewLayer = routesNewLayer;
+                this.dotsNewLayer = dotsNewLayer;
             }
 
             public void execute(CancelableProgressorSource status)
             {
                 editOperation = new EditOperation();
                 editOperation.Name = "Create lines intersect";
-                double d = 0;
-                double d2 = 0;
+                double dc10 = 0;
+                double dc11 = 0;
+                double dc12 = 0;
+                double dc13 = 0;
+                double d2c10 = 0;
+                double d2c11 = 0;
+                double d2c12 = 0;
+                double d2c13 = 0;
                 bool skip = false;
 
                 Selection selection = routesLayer.GetSelection();
@@ -114,7 +129,10 @@ namespace MinecologyProAppModule
                         if (feature == null) continue;
                         var g = feature.GetShape();
                         inspector.Load(routesLayer, feature.GetObjectID());
-                        d = double.Parse(inspector["From_C13"].ToString());
+                        dc10 = double.Parse(inspector["From_C10"].ToString());
+                        dc11 = double.Parse(inspector["From_C11"].ToString());
+                        dc12 = double.Parse(inspector["From_C12"].ToString());
+                        dc13 = double.Parse(inspector["From_C13"].ToString());
                         uint scount2 = 0;
                         using (var cursor2 = featureClass.Search(queryFilter))
                         {
@@ -140,14 +158,20 @@ namespace MinecologyProAppModule
                                 if (!GeometryEngine.Instance.Intersects(g, g2)) continue;
 
                                 inspector.Load(routesLayer, feature2.GetObjectID());
-                                d2 = double.Parse(inspector["From_C13"].ToString());
-                                Polution[] p = { new Polution(d, feature.GetObjectID()) };
-                                Polution[] p2 = { new Polution(d2, feature2.GetObjectID()) };
-                                addGeoms(g, g2, p, p2);
+                                d2c10 = double.Parse(inspector["From_C10"].ToString());
+                                d2c11 = double.Parse(inspector["From_C11"].ToString());
+                                d2c12 = double.Parse(inspector["From_C12"].ToString());
+                                d2c13 = double.Parse(inspector["From_C13"].ToString());
+                                Polution[] p = { new Polution(feature.GetObjectID(), dc10, dc11, dc12, dc13) };
+                                Polution[] p2 = { new Polution(feature2.GetObjectID(), d2c10, d2c11, d2c12, d2c13) };
+                                addGeoms(new PolutionGeom(g, p), new PolutionGeom(g2, p2));
                             }
                         }
                     }
                 }
+
+                status.Progressor.Message = "Создание узлов...";
+                createDotsGeoms(status);
 
                 status.Progressor.Message = "Сохранение...";
                 saveGeoms(status);
@@ -155,6 +179,31 @@ namespace MinecologyProAppModule
                     return;
                 editOperation.Execute();
                 status.Progressor.Message = "Готово";
+            }
+
+            private void createDotsGeoms(CancelableProgressorSource status)
+            {
+                List<PolutionGeom> dots = new List<PolutionGeom>();
+                foreach (var b in polutionGeoms)
+                {
+                    if (status.Progressor.CancellationToken.IsCancellationRequested)
+                        return;
+                    Geometry gd = GeometryEngine.Instance.QueryPoint(b.geometry as Polyline, SegmentExtension.NoExtension, 0, AsRatioOrLength.AsLength);
+                    PolutionGeom d = new PolutionGeom(gd, b.objects.ToArray());
+                    PolutionGeom d2 = dots.Find(dot => GeometryEngine.Instance.Intersects(dot.geometry,gd));
+                    if (d.objects.Sum(v => v.cityPolutionM3)>d2.objects.Sum(v => v.cityPolutionM3))
+                    {
+                        dots.Remove(d2);
+                        dots.Add(d);
+                    }
+                }
+                
+                foreach (var b in dots)
+                {
+                    if (status.Progressor.CancellationToken.IsCancellationRequested)
+                        return;
+                    createDotsFeature(b);
+                }
             }
 
             private void saveGeoms(CancelableProgressorSource status)
@@ -169,15 +218,10 @@ namespace MinecologyProAppModule
 
             private void addGeoms(PolutionGeom polutionGeom, PolutionGeom polutionGeom2)
             {
-                addGeoms(polutionGeom.geometry, polutionGeom2.geometry, polutionGeom.objects.ToArray(), polutionGeom2.objects.ToArray());
-            }
-
-            private void addGeoms(Geometry g, Geometry g2, Polution[] objects1, Polution[] objects2)
-            {
-                var g3 = GeometryEngine.Instance.Intersection(g, g2);
-                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g, g3), objects1));
-                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(g2, g3), objects2));
-                addPolutionGeom(new PolutionGeom(g3, objects1.Union(objects2).ToArray()));
+                var g3 = GeometryEngine.Instance.Intersection(polutionGeom.geometry, polutionGeom2.geometry);
+                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(polutionGeom.geometry, g3), polutionGeom.objects.ToArray()));
+                addPolutionGeom(new PolutionGeom(GeometryEngine.Instance.Difference(polutionGeom2.geometry, g3), polutionGeom2.objects.ToArray()));
+                addPolutionGeom(new PolutionGeom(g3, polutionGeom.objects.ToArray().Union(polutionGeom2.objects.ToArray()).ToArray()));
             }
 
             private void addPolutionGeom(PolutionGeom polutionGeom)
@@ -203,9 +247,25 @@ namespace MinecologyProAppModule
             {
                 var attributes = new Dictionary<string, object>();
                 attributes.Add("SHAPE", polutionGeom.geometry);
-                attributes.Add("Polution1", polutionGeom.objects.Sum(v => v.polution));
+                attributes.Add("LineLength", GeometryEngine.Instance.Length(polutionGeom.geometry));
+                attributes.Add("CityPolutionM3", polutionGeom.objects.Sum(v => v.cityPolutionM3));
+                attributes.Add("VilagePolutionM3", polutionGeom.objects.Sum(v => v.vilagePolutionM3));
+                attributes.Add("CityPolutionT", polutionGeom.objects.Sum(v => v.cityPolutionT));
+                attributes.Add("VilagePolutionT", polutionGeom.objects.Sum(v => v.vilagePolutionT));
                 //attributes.Add("IDs", polutionGeom.objects);
                 editOperation.Create(routesNewLayer, attributes);
+            }
+
+            private void createDotsFeature(PolutionGeom polutionGeom)
+            {
+                var attributes = new Dictionary<string, object>();
+                attributes.Add("SHAPE", polutionGeom.geometry);
+                attributes.Add("CityPolutionM3", polutionGeom.objects.Sum(v => v.cityPolutionM3));
+                attributes.Add("VilagePolutionM3", polutionGeom.objects.Sum(v => v.vilagePolutionM3));
+                attributes.Add("CityPolutionT", polutionGeom.objects.Sum(v => v.cityPolutionT));
+                attributes.Add("VilagePolutionT", polutionGeom.objects.Sum(v => v.vilagePolutionT));
+                //attributes.Add("IDs", polutionGeom.objects);
+                editOperation.Create(dotsNewLayer, attributes);
             }
         }
 
@@ -231,11 +291,17 @@ namespace MinecologyProAppModule
 
         private class Polution
         {
-            public double polution { set; get; }
+            public double cityPolutionM3 { set; get; }
+            public double vilagePolutionM3 { set; get; }
+            public double cityPolutionT { set; get; }
+            public double vilagePolutionT { set; get; }
             public long objectID { set; get; }
-            public Polution(double polution, long objectID)
+            public Polution(long objectID, double cityPolutionM3, double cityPolutionT, double vilagePolutionM3,  double vilagePolutionT)
             {
-                this.polution = polution;
+                this.cityPolutionM3 = cityPolutionM3;
+                this.vilagePolutionM3 = vilagePolutionM3;
+                this.cityPolutionT = cityPolutionT;
+                this.vilagePolutionT = vilagePolutionT;
                 this.objectID = objectID;
             }
         }

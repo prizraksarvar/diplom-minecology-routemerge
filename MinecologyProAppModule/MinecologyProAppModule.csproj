@@ -123,9 +123,17 @@
     <Compile Include="Button1.cs" />
     <Compile Include="Module1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProWindow1.xaml.cs">
+      <DependentUpon>ProWindow1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ShowProWindow1.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="BackstageTab1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProWindow1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -141,6 +149,18 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="DarkImages\GenericButtonBlue32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\GenericButtonPurple16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\GenericButtonPurple32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="DarkImages\GenericButtonPurple16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="DarkImages\GenericButtonPurple32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--
