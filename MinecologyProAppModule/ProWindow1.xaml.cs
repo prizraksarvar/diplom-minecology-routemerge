@@ -101,7 +101,7 @@ namespace MinecologyProAppModule
                 }, status.Progressor);
             }
 
-            Hide();
+            Close();
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
