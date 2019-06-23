@@ -113,6 +113,48 @@ namespace MinecologyProAppModule
         {
 
         }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var a1 = mcb1.Items[mcb1.SelectedIndex] as ComboBoxItem;
+            var a2 = mcb2.Items[mcb2.SelectedIndex] as ComboBoxItem;
+
+            var routesLayer = MapView.Active.Map.GetLayersAsFlattenedList().OfType<FeatureLayer>().FirstOrDefault(f => f.ShapeType == esriGeometryType.esriGeometryPolyline && f.Name == a1.Content as String);
+            var routesNewLayer = MapView.Active.Map.GetLayersAsFlattenedList().OfType<FeatureLayer>().FirstOrDefault(f => f.ShapeType == esriGeometryType.esriGeometryPolyline && f.Name == a2.Content as String);
+            
+            if (routesLayer == null)
+            {
+                MessageBox.Show($@"To run this sample you need to have a polyline feature class layer.");
+                return;
+            }
+
+            if (routesNewLayer == null)
+            {
+                MessageBox.Show($@"To run this sample you need to have a polyline feature class layer.");
+                return;
+            }
+
+            using (var progress = new ProgressDialog("Обработка...", "Отменено", 10000, false))
+            {
+                //progress.Show();
+                var status = new CancelableProgressorSource(progress);
+                status.Max = 10000;
+                status.Value = 0;
+                await QueuedTask.Run(() =>
+                {
+                    // create an instance of the inspector class
+                    //var inspector = new ArcGIS.Desktop.Editing.Attributes.Inspector();
+                    var fc = routesLayer.GetTable() as FeatureClass;
+                    if (fc == null) return;
+                    var fcDefinition = fc.GetDefinition();
+
+                    var proccessor = new Module1.RemoveRoutes(routesLayer, routesNewLayer);
+                    proccessor.execute(status);
+                }, status.Progressor);
+            }
+
+            Close();
+        }
     }
 
     internal class MyComboBox1 : ArcGIS.Desktop.Framework.Contracts.ComboBox

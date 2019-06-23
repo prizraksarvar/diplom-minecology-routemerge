@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:extensions="clr-namespace:ArcGIS.Desktop.Extensions;assembly=ArcGIS.Desktop.Extensions"
         mc:Ignorable="d"
-        Title="Комплексирование маршрутов" Height="319.068" Width="300"
+        Title="Комплексирование маршрутов" Height="369.768" Width="300"
         WindowStartupLocation="CenterOwner"
     >
 	<controls:ProWindow.Resources>
@@ -20,11 +20,12 @@
 		<ComboBox Name="mcb1" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="272" SelectionChanged="ComboBox_SelectionChanged">
 		</ComboBox>
 		<ComboBox Name="mcb2" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" Width="272" SelectionChanged="ComboBox_SelectionChanged_1"/>
-		<Button Content="Начать обработку" HorizontalAlignment="Left" Margin="74,258,0,0" VerticalAlignment="Top" Width="139" Click="Button_Click" RenderTransformOrigin="0.417,-0.015"/>
+		<Button Content="Начать обработку" HorizontalAlignment="Left" Margin="21,258,0,0" VerticalAlignment="Top" Width="252" Click="Button_Click" RenderTransformOrigin="0.417,-0.015"/>
 		<Label Content="Задайте исходынй слой&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="34" Width="156"/>
 		<Label Content="Задайте слой результата&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,76,0,0" VerticalAlignment="Top" Height="34"/>
 		<ComboBox Name="mcb3" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top" Width="272" SelectionChanged="ComboBox_SelectionChanged_1"/>
 		<Label Content="Задайте слой перевалочных пунктов&#xA;" HorizontalAlignment="Left" Margin="10,148,0,0" VerticalAlignment="Top" Height="34"/>
+		<Button Content="Удалить обработанные маршруты" HorizontalAlignment="Left" Margin="21,303,0,0" VerticalAlignment="Top" Width="252" RenderTransformOrigin="0.417,-0.015" Height="20" Click="Button_Click_1"/>
 
 	</Grid>
 </controls:ProWindow>

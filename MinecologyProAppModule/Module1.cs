@@ -226,7 +226,77 @@ namespace MinecologyProAppModule
             });
         }
 
+        public class RemoveRoutes
+        {
+            private FeatureClass featureClass;
+            private FeatureClass featureClass2;
+            private EditOperation editOperation;
 
+            FeatureLayer routesLayer;
+            FeatureLayer routesNewLayer;
+
+            public RemoveRoutes(FeatureLayer routesLayer, FeatureLayer routesNewLayer)
+            {
+                var fc = routesLayer.GetTable() as FeatureClass;
+                if (fc == null) return;
+                this.featureClass = fc;
+                var fc2 = routesNewLayer.GetTable() as FeatureClass;
+                if (fc2 == null) return;
+                this.featureClass2 = fc2;
+                this.routesLayer = routesLayer;
+                this.routesNewLayer = routesNewLayer;
+            }
+
+            public void execute(CancelableProgressorSource status)
+            {
+                editOperation = new EditOperation();
+                editOperation.Name = "Delete routes";
+                Selection selection = routesLayer.GetSelection();
+                QueryFilter queryFilter = new QueryFilter();
+                queryFilter.ObjectIDs = selection.GetObjectIDs();
+                uint count = 0;
+                using (var cursor = featureClass.Search(queryFilter))
+                {
+                    while (cursor.MoveNext())
+                    {
+                        count++;
+                    }
+                }
+                status.Progressor.Max = count;
+                uint scount = 0;
+                using (var cursor = featureClass.Search(queryFilter))
+                {
+                    while (cursor.MoveNext())
+                    {
+                        scount++;
+                        status.Progressor.Value += 1;
+                        status.Progressor.Message = "Обработка маршрутов " + scount.ToString() + " из " + count.ToString();
+                        var feature = cursor.Current as Feature;
+                        if (feature == null) continue;
+                        var g = feature.GetShape();
+                        using (var cursor2 = featureClass2.Search())
+                        {
+                            while (cursor2.MoveNext())
+                            {
+                                if (status.Progressor.CancellationToken.IsCancellationRequested)
+                                    return;
+                                var feature2 = cursor2.Current as Feature;
+                                if (feature2 == null) continue;
+                                var g2 = feature2.GetShape();
+                                if (!GeometryEngine.Instance.Intersects(g, g2)) continue;
+                                editOperation.Delete(routesLayer, feature.GetObjectID());
+                                break;
+                            }
+                        }
+                    }
+                }
+                status.Progressor.Message = "Сохранение...";
+                if (status.Progressor.CancellationToken.IsCancellationRequested)
+                    return;
+                editOperation.Execute();
+                status.Progressor.Message = "Готово";
+            }
+        }
 
         public class AppProccessor
         {
