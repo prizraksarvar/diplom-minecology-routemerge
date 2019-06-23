@@ -412,12 +412,18 @@ namespace MinecologyProAppModule
             private void createFeature(PolutionGeom polutionGeom)
             {
                 var attributes = new Dictionary<string, object>();
+                var cpm3 = polutionGeom.objects.Sum(v => v.cityPolutionM3);
+                var vpm3 = polutionGeom.objects.Sum(v => v.vilagePolutionM3);
+                var cpt = polutionGeom.objects.Sum(v => v.cityPolutionT);
+                var vpt = polutionGeom.objects.Sum(v => v.vilagePolutionT);
                 attributes.Add("SHAPE", polutionGeom.geometry);
                 attributes.Add("LineLength", GeometryEngine.Instance.Length(polutionGeom.geometry));
-                attributes.Add("CityPolutionM3", polutionGeom.objects.Sum(v => v.cityPolutionM3));
-                attributes.Add("VilagePolutionM3", polutionGeom.objects.Sum(v => v.vilagePolutionM3));
-                attributes.Add("CityPolutionT", polutionGeom.objects.Sum(v => v.cityPolutionT));
-                attributes.Add("VilagePolutionT", polutionGeom.objects.Sum(v => v.vilagePolutionT));
+                attributes.Add("CityPolutionM3", cpm3);
+                attributes.Add("VilagePolutionM3", vpm3);
+                attributes.Add("CityPolutionT", cpt);
+                attributes.Add("VilagePolutionT", vpt);
+                attributes.Add("AllPolutionM3", cpm3 + vpm3);
+                attributes.Add("AllPolutionT", cpt + vpt);
                 //attributes.Add("IDs", polutionGeom.objects);
                 editOperation.Create(routesNewLayer, attributes);
             }
@@ -425,11 +431,17 @@ namespace MinecologyProAppModule
             private void createDotsFeature(PolutionGeom polutionGeom)
             {
                 var attributes = new Dictionary<string, object>();
+                var cpm3 = polutionGeom.objects.Sum(v => v.cityPolutionM3);
+                var vpm3 = polutionGeom.objects.Sum(v => v.vilagePolutionM3);
+                var cpt = polutionGeom.objects.Sum(v => v.cityPolutionT);
+                var vpt = polutionGeom.objects.Sum(v => v.vilagePolutionT);
                 attributes.Add("SHAPE", polutionGeom.geometry);
-                attributes.Add("CityPolutionM3", polutionGeom.objects.Sum(v => v.cityPolutionM3));
-                attributes.Add("VilagePolutionM3", polutionGeom.objects.Sum(v => v.vilagePolutionM3));
-                attributes.Add("CityPolutionT", polutionGeom.objects.Sum(v => v.cityPolutionT));
-                attributes.Add("VilagePolutionT", polutionGeom.objects.Sum(v => v.vilagePolutionT));
+                attributes.Add("CityPolutionM3", cpm3);
+                attributes.Add("VilagePolutionM3", vpm3);
+                attributes.Add("CityPolutionT", cpt);
+                attributes.Add("VilagePolutionT", vpt);
+                attributes.Add("AllPolutionM3", cpm3 + vpm3);
+                attributes.Add("AllPolutionT", cpt + vpt);
                 //attributes.Add("IDs", polutionGeom.objects);
                 editOperation.Create(dotsNewLayer, attributes);
             }
