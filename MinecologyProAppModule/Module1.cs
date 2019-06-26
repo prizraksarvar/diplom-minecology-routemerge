@@ -226,8 +226,10 @@ namespace MinecologyProAppModule
             });
         }
 
-        public class RemoveRoutes
+        public class MoveNewRoutes
         {
+            private ArcGIS.Desktop.Editing.Attributes.Inspector inspector = new ArcGIS.Desktop.Editing.Attributes.Inspector();
+
             private FeatureClass featureClass;
             private FeatureClass featureClass2;
             private EditOperation editOperation;
@@ -235,16 +237,17 @@ namespace MinecologyProAppModule
             FeatureLayer routesLayer;
             FeatureLayer routesNewLayer;
 
-            public RemoveRoutes(FeatureLayer routesLayer, FeatureLayer routesNewLayer)
+            List<long> addedObjectIds;
+
+            public MoveNewRoutes(FeatureLayer routesLayer, FeatureLayer routesNewLayer)
             {
                 var fc = routesLayer.GetTable() as FeatureClass;
-                if (fc == null) return;
-                this.featureClass = fc;
+                this.featureClass = fc ?? throw new Exception("routesLayer FeatureClass is null");
                 var fc2 = routesNewLayer.GetTable() as FeatureClass;
-                if (fc2 == null) return;
-                this.featureClass2 = fc2;
+                this.featureClass2 = fc2 ?? throw new Exception("routesNewLayer FeatureClass is null");
                 this.routesLayer = routesLayer;
                 this.routesNewLayer = routesNewLayer;
+                addedObjectIds = new List<long>();
             }
 
             public void execute(CancelableProgressorSource status)
@@ -283,9 +286,15 @@ namespace MinecologyProAppModule
                                 var feature2 = cursor2.Current as Feature;
                                 if (feature2 == null) continue;
                                 var g2 = feature2.GetShape();
+                                
+                                if (addedObjectIds.Exists((i=>i== feature2.GetObjectID()))) continue;
                                 if (!GeometryEngine.Instance.Intersects(g, g2)) continue;
+
+                                addedObjectIds.Add(feature2.GetObjectID());
                                 editOperation.Delete(routesLayer, feature.GetObjectID());
-                                break;
+
+                                createFeature(feature2);
+                                //break;
                             }
                         }
                     }
@@ -295,6 +304,59 @@ namespace MinecologyProAppModule
                     return;
                 editOperation.Execute();
                 status.Progressor.Message = "Готово";
+            }
+
+            private void createFeature(Feature feature)
+            {
+                try
+                {
+                    inspector.Load(routesNewLayer, feature.GetObjectID());
+
+                    double l=0;
+                    double cpm3 = 0;
+                    double vpm3 = 0;
+                    double cpt = 0;
+                    double vpt = 0;
+                    double apm3 = 0;
+                    double apt = 0;
+
+                    var attributes = new Dictionary<string, object>();
+                    try
+                    {
+                        l = double.Parse(inspector["LineLength"].ToString());
+                        cpm3 = double.Parse(inspector["CityPolutionM3"].ToString());
+                        vpm3 = double.Parse(inspector["VilagePolutionM3"].ToString());
+                        cpt = double.Parse(inspector["CityPolutionT"].ToString());
+                        vpt = double.Parse(inspector["VilagePolutionT"].ToString());
+                        apm3 = double.Parse(inspector["AllPolutionM3"].ToString());
+                        apt = double.Parse(inspector["AllPolutionT"].ToString());
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+
+                    attributes.Add("SHAPE", feature.GetShape());
+                    attributes.Add("LineLength", l);
+                    attributes.Add("CityPolutionM3", cpm3);
+                    attributes.Add("VilagePolutionM3", vpm3);
+                    attributes.Add("CityPolutionT", cpt);
+                    attributes.Add("VilagePolutionT", vpt);
+                    attributes.Add("AllPolutionM3", apm3);
+                    attributes.Add("AllPolutionT", apt);
+
+                    attributes.Add("From_C10", cpm3);
+                    attributes.Add("From_C11", cpt);
+                    attributes.Add("From_C12", vpm3);
+                    attributes.Add("From_C13", vpt);
+
+                    //attributes.Add("IDs", polutionGeom.objects);
+                    editOperation.Create(routesLayer, attributes);
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }
 

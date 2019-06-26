@@ -148,7 +148,7 @@ namespace MinecologyProAppModule
                     if (fc == null) return;
                     var fcDefinition = fc.GetDefinition();
 
-                    var proccessor = new Module1.RemoveRoutes(routesLayer, routesNewLayer);
+                    var proccessor = new Module1.MoveNewRoutes(routesLayer, routesNewLayer);
                     proccessor.execute(status);
                 }, status.Progressor);
             }
