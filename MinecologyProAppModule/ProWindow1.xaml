@@ -21,7 +21,7 @@
 		</ComboBox>
 		<ComboBox Name="mcb2" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" Width="272" SelectionChanged="ComboBox_SelectionChanged_1"/>
 		<Button Content="Начать обработку" HorizontalAlignment="Left" Margin="21,258,0,0" VerticalAlignment="Top" Width="252" Click="Button_Click" RenderTransformOrigin="0.417,-0.015"/>
-		<Label Content="Задайте исходынй слой&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="34" Width="156"/>
+		<Label Content="Задайте исходный слой&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="34" Width="156"/>
 		<Label Content="Задайте слой результата&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,76,0,0" VerticalAlignment="Top" Height="34"/>
 		<ComboBox Name="mcb3" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top" Width="272" SelectionChanged="ComboBox_SelectionChanged_1"/>
 		<Label Content="Задайте слой перевалочных пунктов&#xA;" HorizontalAlignment="Left" Margin="10,148,0,0" VerticalAlignment="Top" Height="34"/>

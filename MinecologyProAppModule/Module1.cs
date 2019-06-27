@@ -257,6 +257,12 @@ namespace MinecologyProAppModule
                 Selection selection = routesLayer.GetSelection();
                 QueryFilter queryFilter = new QueryFilter();
                 queryFilter.ObjectIDs = selection.GetObjectIDs();
+
+                if (queryFilter.ObjectIDs.Count() == 0)
+                {
+                    return;
+                }
+
                 uint count = 0;
                 using (var cursor = featureClass.Search(queryFilter))
                 {
@@ -397,6 +403,11 @@ namespace MinecologyProAppModule
                 Selection selection = routesLayer.GetSelection();
                 QueryFilter queryFilter = new QueryFilter();
                 queryFilter.ObjectIDs = selection.GetObjectIDs();
+
+                if (queryFilter.ObjectIDs.Count()==0)
+                {
+                    return;
+                }
 
                 uint count = 0;
                 using (var cursor = featureClass.Search(queryFilter))
@@ -549,7 +560,7 @@ namespace MinecologyProAppModule
                 var cpt = polutionGeom.objects.Sum(v => v.cityPolutionT);
                 var vpt = polutionGeom.objects.Sum(v => v.vilagePolutionT);
                 attributes.Add("SHAPE", polutionGeom.geometry);
-                attributes.Add("LineLength", GeometryEngine.Instance.Length(polutionGeom.geometry));
+                attributes.Add("LineLength", GeometryEngine.Instance.Length(polutionGeom.geometry)/1000);
                 attributes.Add("CityPolutionM3", cpm3);
                 attributes.Add("VilagePolutionM3", vpm3);
                 attributes.Add("CityPolutionT", cpt);
